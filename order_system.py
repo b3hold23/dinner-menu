@@ -28,8 +28,13 @@ def place_order(menu):
     print("Welcome to the Generic Take Out Restaurant.")
 
     # TODO: Create a continuous while loop so customers can order multiple items
+    while True:
+        print("\nWhat would you like to order?")
+        for i in range(1, 7):
+            print(f"{i} - {menu_items[i]['Item name']} - ${menu_items[i]['Price']}")
 
         # TODO: Ask the customer what they want to order
+        menu = input("Please enter the number of the item you would like to order: ")
 
 
         # Create a variable for the menu item number
@@ -39,28 +44,46 @@ def place_order(menu):
         print_menu_heading()
 
         # TODO: Loop through the menu dictionary
-        # TODO: Extract the food category and the options for each category
+        for i in range(menu):
+            # TODO: Extract the food category and the options for each category
+            food_category = menu[i]['Food category']
+            print(i + 1, food_category)
+        
 
             # TODO: Loop through the options for each food category
+        for i in range(food_category):
             # TODO: Extract the meal and the price for each option
+            meal = menu[i]['Meal']
+            price = menu[i]['Price']
+            print(i + 1, meal, price)
 
-                # Print the menu item number, food category, meal, and price
-                # TODO: Only if you used different variable names
-                # TODO: Update the variable names in the following function
-                print_menu_line(i, food_category, meal, price)
+            # Print the menu item number, food category, meal, and price
+            # TODO: Only if you used different variable names
+            # TODO: Update the variable names in the following function
+            print_menu_line(i, food_category, meal, price)
 
-                # Update the menu selection number
-                i += 1
+            # Update the menu selection number
+            i += 1
 
         # TODO: Ask customer to input menu item number
+        menu_selection = input("Please enter the number of the item you would like to order: ")
 
 
         # TODO: Update the order list using the update_order function
+        order = update_order(order, menu_selection, menu_items)
         # TODO: Send the order list, menu selection, and menu items as arguments
+        order.append(menu_selection)
+        
 
 
         # TODO: Ask the customer if they would like to order anything else
+        order_more = input("Would you like to order anything else? (y/n): ")
         # TODO: Let the customer know if they should type 'n' or 'N' to quit
+        if order_more == 'n' or order_more == 'N':
+            break
+        else:
+            continue
+        return order
 
 
         # TODO: Write a conditional statement that checks the user's input
