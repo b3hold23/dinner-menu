@@ -1,8 +1,8 @@
-def print_menu(menu_items):
-    print("\nWhat would you like to order?")
-    for i, (item_name, item_info) in enumerate(menu_items.items(), start=1):
-        print(f"{i}. {item_name} - ${item_info['Price']}")
-    print("Enter 0 to complete your order.")
+# def print_menu(item_list):
+#     print("\nWhat would you like to order?")
+#     for i, (item_name, item_info) in enumerate(item_list.items(), start=1):
+#         print(f"{i}. {item_name} - ${item_info['Price']}")
+#     print("Enter 0 to complete your order.")
 
 
 def get_quantity(item_name):
@@ -15,7 +15,6 @@ def get_quantity(item_name):
             return quantity
         except ValueError:
             print("Please enter a number.")
-
 
 def place_order(menu):
     """
@@ -39,48 +38,66 @@ def place_order(menu):
     # Set up order list. Order list will store a list of dictionaries for
     # menu item name, item price, and quantity ordered
     order = []
+    item_list = []
 
     # Get the menu items mapped to the menu numbers
-    menu_items = get_menu_items_dict(menu)
+    for category, items in menu.items():
+        for meal, price in items.items():
+            full_name = f"{category} - {meal}"
+            item_list.append({"name": full_name, "price": price})
 
     # Launch the store and present a greeting to the customer
     print("Welcome to the Generic Take Out Restaurant.")
 
     while True:
-        print_menu(menu_items)
+        print("\nWhat would you like to order?")
+        for i, item in enumerate(item_list, start=1):
+            print(f"{i}. {item['name']} - ${item['price']:.2f}")
+        print("Enter 0 to complete your order.")
+
         try:
-            order_index = int(input("Enter the number of the item you would like to order: "))
+            order_index = int(input("Please enter the number of the item you would like to order: "))
             if order_index == 0:
                 break
-            if order_index < 0 or order_index > len(menu_items):
-                print("Invalid input. Please enter a valid number.")
+            if order_index < 1 or order_index > len(item_list):
+                print("Please enter a valid number.")
                 continue
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("Please enter a number.")
+            continue
+        
+        selected_item = item_list[order_index - 1]
+
+        try:
+            quantity = int(input(f"How many {selected_item['name']} would you like to order? "))
+            if quantity < 1:
+                print("Please enter a valid quantity.")
+                continue
+        except ValueError:
+            print("Please enter a number.")
             continue
 
-        selected_item_name = list(menu_items.keys())[order_index - 1]
-        selected_item = menu_items[selected_item_name]
-        quantity = get_quantity(selected_item_name)
-
         order.append({
-            "Item name": selected_item_name,
-            "Price": selected_item['Price'],
+            "Item name": selected_item['name'],
+            "Price": selected_item['price'],
             "Quantity": quantity
         })
 
-        order_more = input("Would You like to order more items? (y/n): ").strip().lower()
-        if order_more != 'y':
+        order_more = input("Would you like to order more items? (y/n) ").strip().lower()
+        if order_more != "y":
             break
 
     order_total = round(sum([item['Price'] * item['Quantity'] for item in order]), 2)
 
     print("\nThank you for your order. Here is your receipt:")
-    print_itemized_receipt(order)
+    for item in order:
+        print(f"{item['Item name']} | ${item['Price']:.2f} | {item['Quantity']}")
+    print(f"Total price: ${order_total:.2f}")
+
     return order, order_total
 
 
-def update_order(order, menu_selection, menu_items):
+def update_order(order, menu_selection, item_list):
     """
     Checks if the customer menu selection is valid, then updates the order.
 
@@ -88,24 +105,21 @@ def update_order(order, menu_selection, menu_items):
     order (list): A list of dictionaries containing the menu item name, price,
                     and quantity ordered.
     menu_selection (str): The customer's menu selection.
-    menu_items (dictionary): A dictionary containing the menu items and their
+    item_list (dictionary): A dictionary containing the menu items and their
                             prices.
 
     Returns:
     order (list): A list of dictionaries containing the menu item name, price,
                     and quantity ordered (updated as needed).
-    """
-    
-    try: 
+    """  
+    try:
         menu_selection = int(menu_selection)
     except ValueError:
         print("Invalid input. Please enter a number.")
         return order
-
-        
-    if 1 <= menu_selection <= len(menu_items):
-        item_name = list(menu_items.keys())[menu_selection - 1]
-        item_price = menu_items[item_name]['Price']
+    if 1 <= menu_selection <= len(item_list):
+        item_name = list(item_list.keys())[menu_selection - 1]
+        item_price = item_list[item_name]['Price']
 
         try:
             quantity = int(input(f"How many {item_name} would you like to order? "))
@@ -123,8 +137,7 @@ def update_order(order, menu_selection, menu_items):
         })
         print(f"{quantity} {item_name} added to your order.")
     else:
-        print("Invalid input. Please enter a valid number.")
-    
+        print("Invalid input. Please enter a valid number.")   
     return order
 def print_itemized_receipt(receipt):
     """
@@ -232,11 +245,11 @@ def get_menu_items_dict(menu):
                         prices.
 
     Returns:
-    menu_items (dictionary): A dictionary containing the menu items and their
+    item_list (dictionary): A dictionary containing the menu items and their
                             prices.
     """
     # Create an empty dictionary to store the menu items
-    menu_items = {}
+    item_list = {}
 
     # Create a variable for the menu item number
     i = 1
@@ -245,14 +258,14 @@ def get_menu_items_dict(menu):
     for food_category, options in menu.items():
         # Loop through the options for each food category
         for meal, price in options.items():
-            # Store the menu item number, item name and price in the menu_items
-            menu_items[i] = {
+            # Store the menu item number, item name and price in the item_list
+            item_list[i] = {
                 "Item name": food_category + " - " + meal,
                 "Price": price
             }
             i += 1
 
-    return menu_items
+    return item_list
 
 def get_menu_dictionary():
     """
