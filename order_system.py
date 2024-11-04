@@ -1,3 +1,22 @@
+def print_menu(menu_items):
+    print("\nWhat would you like to order?")
+    for i, (item_name, item_info) in enumerate(menu_items.items(), start=1):
+        print(f"{i}. {item_name} - ${item_info['Price']}")
+    print("Enter 0 to complete your order.")
+
+
+def get_quantity(item_name):
+    while True:
+        try:
+            quantity = int(input(f"How many {item_name} would you like to order? "))
+            if quantity < 1:
+                print("Please enter a valid quantity.")
+                continue
+            return quantity
+        except ValueError:
+            print("Please enter a number.")
+
+
 def place_order(menu):
     """
     Displays a restaurant menu, asks customers for their order, then returns
@@ -27,36 +46,22 @@ def place_order(menu):
     # Launch the store and present a greeting to the customer
     print("Welcome to the Generic Take Out Restaurant.")
 
-    # TODO: Create a continuous while loop so customers can order multiple items
     while True:
-        print("\nWhat would you like to order?")
-
-        for i, (item_name, item_info) in enumerate(menu_items.items(), start=1):
-            print(f"{i + 1}. {item_name} - ${item_info['Price']}")
-
-        # TODO: Ask the customer what they want to order
-        try: 
-            order_index = int(input("Please enter the number of the item you would like to order: "))
+        print_menu(menu_items)
+        try:
+            order_index = int(input("Enter the number of the item you would like to order: "))
             if order_index == 0:
                 break
-            if order_index < 1 or order_index > len(menu_items):
-                print("Please enter a valid number.")
+            if order_index < 0 or order_index > len(menu_items):
+                print("Invalid input. Please enter a valid number.")
                 continue
         except ValueError:
-            print("Please enter a number.")
+            print("Invalid input. Please enter a number.")
             continue
-        
+
         selected_item_name = list(menu_items.keys())[order_index - 1]
         selected_item = menu_items[selected_item_name]
-
-        try:
-            quantity = int(input(f"How many {selected_item_name} would you like to order? "))
-            if quantity < 1:
-                print("Please enter a valid quantity.")
-                continue
-        except ValueError:
-            print("Please enter a number.")
-            continue
+        quantity = get_quantity(selected_item_name)
 
         order.append({
             "Item name": selected_item_name,
@@ -64,17 +69,14 @@ def place_order(menu):
             "Quantity": quantity
         })
 
-        order_more = input("Would you like to order more items? (y/n) ").strip().lower()
-        if order_more != "y":
+        order_more = input("Would You like to order more items? (y/n): ").strip().lower()
+        if order_more != 'y':
             break
 
     order_total = round(sum([item['Price'] * item['Quantity'] for item in order]), 2)
 
-    print("\nThank for your order. Here is your receipt:")
-    for item in order:
-        print(f"{item['Item name']} | ${item['Price']} | {item['Quantity']}")
-    print(f"Total price: ${order_total:.2f}")
-
+    print("\nThank you for your order. Here is your receipt:")
+    print_itemized_receipt(order)
     return order, order_total
 
 
@@ -93,14 +95,14 @@ def update_order(order, menu_selection, menu_items):
     order (list): A list of dictionaries containing the menu item name, price,
                     and quantity ordered (updated as needed).
     """
-    # TODO: Check if the customer typed a number
+    
     try: 
         menu_selection = int(menu_selection)
     except ValueError:
         print("Invalid input. Please enter a number.")
         return order
 
-        # TODO: Convert the menu selection to an integer
+        
     if 1 <= menu_selection <= len(menu_items):
         item_name = list(menu_items.keys())[menu_selection - 1]
         item_price = menu_items[item_name]['Price']
@@ -133,15 +135,20 @@ def print_itemized_receipt(receipt):
                     and quantity ordered.
     """
     # Uncomment the following line if you need to check the structure of the receipt
-    #print(receipt)
+    print_receipt_heading()
 
-    # TODO: Loop through the items in the customer's receipt
+    total_price = 0.0
 
-        # TODO Store the dictionary items as variables
+    for item in receipt:
+        item_name = item.get("Item name")
+        price = item.get("Price")
+        quantity = item.get("Quantity")
 
+        print_receipt_line(item_name, price, quantity)
 
-        # TODO: Print the receipt line using the print_receipt_line function
-        # TODO: Send the item name, price, and quantity as separate arguments
+        total_price += price * quantity
+
+    print_receipt_footer(total_price)
 
 
 ##################################################
