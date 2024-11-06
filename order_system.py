@@ -53,7 +53,6 @@ def place_order(menu):
         print("\nWhat would you like to order?")
         for i, item in enumerate(item_list, start=1):
             print(f"{i}. {item['name']} - ${item['price']:.2f}")
-        print("Enter 0 to complete your order.")
 
         try:
             order_index = int(input("Please enter the number of the item you would like to order: "))
