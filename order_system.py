@@ -1,20 +1,14 @@
-# def print_menu(item_list):
-#     print("\nWhat would you like to order?")
-#     for i, (item_name, item_info) in enumerate(item_list.items(), start=1):
-#         print(f"{i}. {item_name} - ${item_info['Price']}")
-#     print("Enter 0 to complete your order.")
-
-
-def get_quantity(item_name):
+def get_quantity(item_name, quantity=None):
     while True:
         try:
-            quantity = int(input(f"How many {item_name} would you like to order? "))
+            quantity = int(quantity if quantity is not None else input(f"How many {item_name} would you like to order? "))
             if quantity < 1:
                 print("Please enter a valid quantity.")
                 continue
             return quantity
         except ValueError:
             print("Please enter a number.")
+
 
 def place_order(menu):
     """
@@ -35,27 +29,29 @@ def place_order(menu):
                   and quantity ordered.
     order_total (float): The total price of the order.
     """
-    # Set up order list. Order list will store a list of dictionaries for
-    # menu item name, item price, and quantity ordered
     order = []
     item_list = []
 
-    # Get the menu items mapped to the menu numbers
+    # Map menu items to numbers with formatted names and prices.
     for category, items in menu.items():
         for meal, price in items.items():
             full_name = f"{category} - {meal}"
             item_list.append({"name": full_name, "price": price})
 
-    # Launch the store and present a greeting to the customer
+    # Greeting and formatted menu header.
     print("Welcome to the Generic Take Out Restaurant.")
+    print("What would you like to order? ")
+    print("--------------------------------------------------")
+    print("Item # | Item name                        | Price")
+    print("-------|----------------------------------|-------")
+
+    # Display items in a table format with alignment.
+    for i, item in enumerate(item_list, start=1):
+        print(f"{i:<7} | {item['name']:<32} | ${item['price']:.2f}")
 
     while True:
-        print("\nWhat would you like to order?")
-        for i, item in enumerate(item_list, start=1):
-            print(f"{i}. {item['name']} - ${item['price']:.2f}")
-
         try:
-            order_index = int(input("Please enter the number of the item you would like to order: "))
+            order_index = int(input("Type menu number: "))
             if order_index == 0:
                 break
             if order_index < 1 or order_index > len(item_list):
@@ -66,35 +62,22 @@ def place_order(menu):
             continue
         
         selected_item = item_list[order_index - 1]
+        quantity = get_quantity(selected_item["name"])
 
-        try:
-            quantity = int(input(f"How many {selected_item['name']} would you like to order? "))
-            if quantity < 1:
-                print("Please enter a valid quantity.")
-                continue
-        except ValueError:
-            print("Please enter a number.")
-            continue
-
+        # Add selected item to order.
         order.append({
             "Item name": selected_item['name'],
             "Price": selected_item['price'],
             "Quantity": quantity
         })
 
-        order_more = input("Would you like to order more items? (y/n) ").strip().lower()
+        order_more = input("Would you like to keep ordering? (N) to quit: ").strip().lower()
         if order_more != "y":
             break
 
+    # Calculate total and print formatted receipt.
     order_total = round(sum([item['Price'] * item['Quantity'] for item in order]), 2)
-
-    print("\nThank you for your order. Here is your receipt:")
-    for item in order:
-        print(f"{item['Item name']} | ${item['Price']:.2f} | {item['Quantity']}")
-    print(f"Total price: ${order_total:.2f}")
-
     return order, order_total
-
 
 def update_order(order, menu_selection, item_list):
     """
@@ -147,7 +130,6 @@ def print_itemized_receipt(receipt):
                     and quantity ordered.
     """
     # Uncomment the following line if you need to check the structure of the receipt
-    print_receipt_heading()
 
     total_price = 0.0
 
@@ -159,8 +141,6 @@ def print_itemized_receipt(receipt):
         print_receipt_line(item_name, price, quantity)
 
         total_price += price * quantity
-
-    print_receipt_footer(total_price)
 
 
 ##################################################
